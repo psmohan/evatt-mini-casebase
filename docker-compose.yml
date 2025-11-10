@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  evatt-api:
+    build: ./evatt-api
+    depends_on:
+      - qdrant
+    ports:
+      - "8000:8000"
+    environment:
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+
+  evatt-mini:
+    build: ./evatt-mini
+    depends_on:
+      - evatt-api
+    ports:
+      - "3000:3000"
+
+volumes:
+  qdrant_storage:
